@@ -68,7 +68,6 @@ const Finder = () => {
 
     const getTodoName = (e) => {
         setTodoName(e.target.value);
-        if (todoName === "") setErrorName("");
         setErrorName("");
     };
     const getEmail = (e) => {
@@ -80,10 +79,10 @@ const Finder = () => {
         setErrorStatus("");
     };
     const focus = () => {
-        setErrorName("input something here");
+        if (todoName === "") setErrorName("input something here");
     };
     const blur = () => {
-        if (todoName === "") setErrorName("input please");
+        if (todoName === "") setErrorName("Todo doesn't blank!");
     };
     const handleSubmit = (e) => {
         const name = todoName;
