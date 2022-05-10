@@ -140,6 +140,8 @@ const Finder = () => {
                                 name="email"
                                 value={email}
                                 onChange={getEmail}
+                                onFocus={focus}
+                                onBlur={blur}
                             />
                             <p className="error">{errorEmail}</p>
                         </li>
