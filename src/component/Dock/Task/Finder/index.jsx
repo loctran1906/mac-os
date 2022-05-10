@@ -5,18 +5,21 @@ const Finder = () => {
     const statusList = ["Doing", "Refus", "Done"];
     const [todoList, setTodoList] = useState([]);
     const [todoName, setTodoName] = useState("");
+    const [email, setEmail] = useState("");
     const [statusChoosed, setStatusChoosed] = useState("");
     const [hideFinder, setHideFinder] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [todoSelected, setTodoSelected] = useState(-1);
     const [errorName, setErrorName] = useState("");
     const [errorStatus, setErrorStatus] = useState("");
+    const [errorEmail, setErrorEmail] = useState("");
 
     useEffect(() => {
         if (isEditing && todoSelected !== -1) {
             const todoItem = todoList[todoSelected];
             setTodoName(todoItem.todo);
             setStatusChoosed(todoItem.status);
+            setEmail(todoItem.email);
         }
     }, [isEditing, todoSelected]);
 
@@ -28,40 +31,59 @@ const Finder = () => {
         setTodoName(e.target.value);
         setErrorName("");
     };
-
+    const getEmail = (e) => {
+        setEmail(e.target.value);
+        setErrorEmail("");
+    };
     const getStatus = (e) => {
         setStatusChoosed(e.target.value);
         setErrorStatus("");
     };
-
+    const focus = () => {
+        setErrorName("input something here");
+    };
+    const blur = () => {
+        if (todoName === "") setErrorName("input please");
+    };
     const handleSubmit = (e) => {
         const name = todoName;
         const status = statusChoosed;
+        const emailInit = email;
         e.preventDefault();
+        if (email === "") {
+            setErrorEmail("not blank!");
+            return false;
+        } else if (email.length < 5) {
+            setErrorEmail("email must has 5 characters at less");
+            return false;
+        } else if (!email.match(/^[^ ]+@[^ ]+\.[a-z]{2,3}$/)) {
+            setErrorEmail("email invalid.example: chien@xxx.com");
+            return false;
+        } else if (name === "") {
+            setErrorName("Todo doesn't blank!");
+            return false;
+        } else if (status === "") {
+            setErrorStatus("Please chose one status!");
+            return false;
+        }
         if (!isEditing) {
-            if (name === "") {
-                setErrorName("Todo doesn't blank!");
-                return false;
-            }
-
-            if (status === "") {
-                setErrorStatus("Please chose one status!");
-                return false;
-            }
             setTodoList((values) => [
                 ...values,
-                { todo: name, status: status, id: uuidv4() },
+                { todo: name, status: status, email: emailInit, id: uuidv4() },
             ]);
             setTodoName("");
             setStatusChoosed("");
+            setEmail("");
             setErrorName("");
             setErrorStatus("");
+            setErrorEmail("");
         } else {
             const newTodoList = [...todoList];
             const newTodo = {
                 ...todoList[todoSelected],
                 todo: name,
                 status: status,
+                email: emailInit,
             };
             newTodoList[todoSelected] = newTodo;
 
@@ -69,6 +91,7 @@ const Finder = () => {
             setIsEditing(false);
             setStatusChoosed("");
             setTodoName("");
+            setEmail("");
         }
     };
 
@@ -112,12 +135,23 @@ const Finder = () => {
                         <li className="item">
                             <input
                                 type="text"
+                                id="email"
+                                placeholder="email of person make todo"
+                                name="email"
+                                value={email}
+                                onChange={getEmail}
+                            />
+                            <p className="error">{errorEmail}</p>
+                        </li>
+                        <li className="item">
+                            <input
+                                type="text"
                                 id="job-name"
                                 placeholder="job name"
                                 name="todo"
                                 onChange={getTodoName}
-                                onBlur={getTodoName}
-                                onFocus={getTodoName}
+                                onBlur={blur}
+                                onFocus={focus}
                                 value={todoName}
                             />
                             <p className="error">{errorName}</p>
@@ -169,6 +203,7 @@ const Finder = () => {
                     <thead id="table-head">
                         <tr>
                             <th>No</th>
+                            <th>Email</th>
                             <th>Job name</th>
                             <th>Status</th>
                             <th colSpan={2}>Action</th>
@@ -181,6 +216,7 @@ const Finder = () => {
                                 <>
                                     <tr key={todo.id}>
                                         <td>{index + 1}</td>
+                                        <td>{todo.email}</td>
                                         <td>{todo.todo}</td>
                                         <td>{todo.status}</td>
                                         <td>
